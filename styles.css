@@ -47,9 +47,13 @@ body {
     align-items: center;
 }
 
-.logo {
-    max-width: 120px;
-    height: auto;
+.logo-svg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-svg svg {
     border-radius: 20px;
     box-shadow: 0 8px 32px rgba(58, 166, 255, 0.3);
     transition: all 0.3s ease;
@@ -57,7 +61,7 @@ body {
     padding: 10px;
 }
 
-.logo:hover {
+.logo-svg svg:hover {
     transform: translateY(-5px) scale(1.05);
     box-shadow: 0 12px 40px rgba(58, 166, 255, 0.4);
 }
