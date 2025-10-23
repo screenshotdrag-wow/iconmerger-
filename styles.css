@@ -39,6 +39,29 @@ body {
     font-weight: 300;
 }
 
+/* Logo Styles */
+.logo-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    max-width: 120px;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(58, 166, 255, 0.3);
+    transition: all 0.3s ease;
+    background: white;
+    padding: 10px;
+}
+
+.logo:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 40px rgba(58, 166, 255, 0.4);
+}
+
 /* 플랫폼 선택기 */
 .platform-selector {
     margin-top: 30px;
