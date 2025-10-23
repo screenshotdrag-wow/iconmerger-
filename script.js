@@ -14,7 +14,50 @@ class IconMerger {
         this.optimalInputSize = 512; // 권장 입력 크기 (업계 표준)
         this.currentPlatform = 'windows'; // 현재 선택된 플랫폼
         this.mergedIcon = null; // 병합된 아이콘 데이터
+        this.conversionStartTime = null; // 변환 시작 시간
         this.init();
+        this.initAnalytics();
+    }
+    
+    // Analytics tracking methods
+    initAnalytics() {
+        // Track page view
+        if (typeof gtag !== 'undefined') {
+            gtag('event', 'page_view', {
+                page_title: 'IconMerger - PNG to ICO Converter',
+                page_location: window.location.href
+            });
+        }
+    }
+    
+    trackEvent(eventName, parameters = {}) {
+        if (typeof gtag !== 'undefined') {
+            gtag('event', eventName, parameters);
+        }
+    }
+    
+    trackFileUpload(fileSize, fileType) {
+        this.trackEvent('file_upload', {
+            file_size: fileSize,
+            file_type: fileType,
+            platform: this.currentPlatform
+        });
+    }
+    
+    trackConversion(iconCount, platform) {
+        this.trackEvent('icon_conversion', {
+            icon_count: iconCount,
+            platform: platform,
+            conversion_time: Date.now() - this.conversionStartTime
+        });
+    }
+    
+    trackDownload(action, fileCount) {
+        this.trackEvent('download', {
+            action: action, // 'individual' or 'merged'
+            file_count: fileCount,
+            platform: this.currentPlatform
+        });
     }
 
     init() {
@@ -126,6 +169,7 @@ class IconMerger {
     handleFileSelect(e) {
         const file = e.target.files[0];
         if (file) {
+            this.trackFileUpload(file.size, file.type);
             this.processFile(file);
         }
     }
@@ -424,6 +468,7 @@ class IconMerger {
             return;
         }
 
+        this.conversionStartTime = Date.now();
         // 로딩 표시
         document.getElementById('loadingArea').style.display = 'block';
         document.getElementById('downloadArea').style.display = 'none';
@@ -433,6 +478,10 @@ class IconMerger {
             document.getElementById('loadingArea').style.display = 'none';
             document.getElementById('downloadArea').style.display = 'block';
             this.displayConvertedIcons();
+            
+            // 변환 완료 추적
+            const iconCount = this.resizedImages[this.currentPlatform]?.length || 0;
+            this.trackConversion(iconCount, this.currentPlatform);
         }, 1000);
     }
 
@@ -476,6 +525,9 @@ class IconMerger {
 
         // 체크된 아이콘들만 가져오기
         const checkedIcons = this.getCheckedIcons();
+        
+        // 다운로드 추적
+        this.trackDownload('individual', checkedIcons.length);
 
         if (checkedIcons.length === 0) {
             alert('Please select icons to download.');
@@ -590,6 +642,9 @@ class IconMerger {
         if (!this.mergedIcon) return;
         
         const platform = this.mergedIcon.platform;
+        
+        // 병합 다운로드 추적
+        this.trackDownload('merged', this.mergedIcon.icons.length);
         
         if (platform === 'windows') {
             // 윈도우용 ICO 파일 생성 (실제 다중 해상도 ICO)

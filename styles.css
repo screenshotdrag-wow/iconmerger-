@@ -799,6 +799,20 @@ body {
     text-decoration: underline;
 }
 
+/* Ad Container Styles */
+.ad-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 0 20px;
+    text-align: center;
+}
+
+.ad-container ins {
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 /* 반응형 디자인 */
 @media (max-width: 768px) {
     .container {
