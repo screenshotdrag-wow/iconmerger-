@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IconMerger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>IconMerger</h1>
+            <p>Convert PNG to ICO and merge icons</p>
+            
+            <div class="platform-selector">
+                <h3>Platform Selection</h3>
+                <div class="platform-buttons">
+                    <button class="platform-btn active" data-platform="windows">
+                        <span class="platform-icon">🪟</span>
+                        <span class="platform-name">Windows</span>
+                        <span class="platform-desc">ICO File</span>
+                    </button>
+                    <button class="platform-btn disabled" data-platform="mac">
+                        <span class="platform-icon">🍎</span>
+                        <span class="platform-name">Mac</span>
+                        <span class="platform-desc">Coming Soon</span>
+                    </button>
+                    <button class="platform-btn disabled" data-platform="android">
+                        <span class="platform-icon">🤖</span>
+                        <span class="platform-name">Android</span>
+                        <span class="platform-desc">Coming Soon</span>
+                    </button>
+                    <button class="platform-btn disabled" data-platform="ios">
+                        <span class="platform-icon">📱</span>
+                        <span class="platform-name">iOS</span>
+                        <span class="platform-desc">Coming Soon</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- 1단계: PNG 업로드 -->
+        <section class="step" id="step1">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <h2>PNG File Upload</h2>
+                <p>Drag and drop or click to upload PNG image for conversion</p>
+                <div class="upload-tip" id="uploadTip">
+                    <p><strong>💡 Recommended Size:</strong></p>
+                    <p>• <strong>512×512px</strong> recommended (Windows ICO file)</p>
+                </div>
+                
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                        <div class="upload-icon">📁</div>
+                        <p>Drag and drop PNG file or<br>paste (Ctrl+V) or click to upload</p>
+                        <input type="file" id="fileInput" accept=".png" hidden>
+                        <input type="file" id="fileInput2" accept=".png" style="display: none;">
+                    </div>
+                </div>
+
+                <div class="preview-area" id="previewArea" style="display: none;">
+                    <div class="preview-header">
+                        <h3>Original Image (Uploaded Size)</h3>
+                        <button class="btn btn-delete" id="deleteImageBtn">🗑️ Delete</button>
+                    </div>
+                    <div class="preview-container">
+                        <img id="previewImage" alt="Preview">
+                    </div>
+                    
+
+                    <div class="resize-section" id="resizeSection" style="display: none;">
+                        <h3 id="resizeTitle">Windows ICO Icons</h3>
+                        <p id="resizeDescription">Display each size at actual size</p>
+                        <div class="resize-grid" id="resizeGrid">
+                            <!-- Resized images will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="convertBtn">Convert All Icons</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2단계: ICO 변환 -->
+        <section class="step" id="step2">
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <h2>Icon Conversion</h2>
+                <p>Convert PNG file to platform-specific icon format</p>
+                
+                <div class="conversion-area" id="conversionArea">
+                    <div class="loading" id="loadingArea" style="display: none;">
+                        <div class="spinner"></div>
+                        <p>Converting...</p>
+                    </div>
+                    
+                    <div class="download-area" id="downloadArea" style="display: none;">
+                        <div class="success-icon">✅</div>
+                        <h3>Conversion Complete!</h3>
+                        
+                        <div class="converted-icons-grid" id="convertedIconsGrid">
+                            <!-- Converted icons will be displayed here -->
+                        </div>
+                        
+                        <div class="download-actions">
+                            <button class="btn btn-primary" id="downloadBtn">Download</button>
+                            <button class="btn btn-highlight" id="mergeBtn">Merge</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3단계: ICO 병합 -->
+        <section class="step" id="step3">
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <h2>ICO File Merge</h2>
+                <p>Merge selected icons into a single ICO file</p>
+                
+                <div class="merge-area" id="mergeArea" style="display: none;">
+                    <div class="ico-list" id="icoList">
+                        <p class="empty-message">No ICO files added yet</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 IconMerger. All rights reserved.</p>
+            <p>Contact: <a href="mailto:contact@iconmerger.com">contact@iconmerger.com</a></p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-to-ico@1.0.0/dist/canvas-to-ico.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
