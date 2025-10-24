@@ -187,7 +187,10 @@
     
     
     <!-- Vercel Analytics -->
-    <script src="https://va.vercel-scripts.com/v1/script.debug.js" defer></script>
+    <script type="module">
+        import { inject } from "@vercel/analytics";
+        inject();
+    </script>
     
     <script src="script.js"></script>
 </body>
