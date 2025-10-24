@@ -184,14 +184,9 @@
     
     
     <!-- Vercel Analytics -->
-    <script>
-        // Vercel Analytics for vanilla JavaScript
-        (function() {
-            var script = document.createElement('script');
-            script.src = 'https://va.vercel-scripts.com/v1/script.debug.js';
-            script.defer = true;
-            document.head.appendChild(script);
-        })();
+    <script type="module">
+        import { inject } from "@vercel/analytics";
+        inject();
     </script>
     
     <script src="script.js"></script>
