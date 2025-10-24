@@ -1,28 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <!-- Cookiebot Consent Banner -->
-    <script id="Cookiebot" src="https://consent.cookiebot.com/uc.js" data-cbid="bfa379fd-134f-4e57-b14f-048a382ce368" type="text/javascript" async></script>
     
-    <!-- Google Consent Mode -->
-    <script data-cookieconsent="ignore">
-        window.dataLayer = window.dataLayer || [];
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-        gtag("consent", "default", {
-            ad_personalization: "denied",
-            ad_storage: "denied",
-            ad_user_data: "denied",
-            analytics_storage: "denied",
-            functionality_storage: "denied",
-            personalization_storage: "denied",
-            security_storage: "granted",
-            wait_for_update: 500,
-        });
-        gtag("set", "ads_data_redaction", true);
-        gtag("set", "url_passthrough", false);
-    </script>
     
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,10 +15,6 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Google Tag Manager (noscript) -->
-    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-XXXXXXX"
-    height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-    <!-- End Google Tag Manager (noscript) -->
     
     <div class="container">
         <header class="header">
@@ -156,6 +131,7 @@
                         <div class="download-actions">
                             <button class="btn btn-primary" id="downloadBtn">Download</button>
                             <button class="btn btn-highlight" id="mergeBtn">Merge</button>
+                            <button class="btn btn-secondary" id="testErrorBtn" style="margin-top: 10px;">🧪 Test Sentry Error</button>
                         </div>
                     </div>
                 </div>
@@ -177,15 +153,6 @@
             </div>
         </section>
         
-        <!-- AdSense Banner Ad -->
-        <div class="ad-container">
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-                 data-ad-slot="XXXXXXXXXX"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-        </div>
     </div>
 
     <footer class="footer">
@@ -196,30 +163,35 @@
         </div>
     </footer>
 
+    <!-- Sentry Error Tracking -->
+    <script src="https://browser.sentry-cdn.com/7.77.0/bundle.min.js"></script>
+    <script>
+        Sentry.init({
+            dsn: "https://db9cf43a2d7b6eb660950bc5710f5115@o4510244180393984.ingest.us.sentry.io/4510244189437952",
+            integrations: [
+                // Sentry.browserTracingIntegration(), // 이 함수가 존재하지 않음
+            ],
+            tracesSampleRate: 1.0,
+            debug: false,
+            environment: "production"
+        });
+    </script>
+    
     <script src="https://cdn.jsdelivr.net/npm/canvas-to-ico@1.0.0/dist/canvas-to-ico.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9T7JWY2ZWW"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'G-9T7JWY2ZWW');
-    </script>
     
-    <!-- Google Tag Manager -->
-    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-    new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-    'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-    })(window,document,'script','dataLayer','GTM-XXXXXXX');</script>
     
-    <!-- Google AdSense -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
-            crossorigin="anonymous"></script>
+    
+    <!-- Vercel Analytics -->
     <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
+        // Vercel Analytics for vanilla JavaScript
+        (function() {
+            var script = document.createElement('script');
+            script.src = 'https://va.vercel-scripts.com/v1/script.debug.js';
+            script.defer = true;
+            document.head.appendChild(script);
+        })();
     </script>
     
     <script src="script.js"></script>

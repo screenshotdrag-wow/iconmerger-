@@ -91,6 +91,14 @@ class IconMerger {
 
         // 버튼 이벤트
         convertBtn.addEventListener('click', this.convertToIco.bind(this));
+        
+        // Sentry 에러 테스트 버튼
+        const testErrorBtn = document.getElementById('testErrorBtn');
+        if (testErrorBtn) {
+            testErrorBtn.addEventListener('click', () => {
+                this.testSentryError();
+            });
+        }
         downloadBtn.addEventListener('click', this.downloadIco.bind(this));
         mergeBtn.addEventListener('click', this.mergeIcons.bind(this));
         
@@ -937,6 +945,22 @@ class IconMerger {
         document.body.removeChild(link);
         
         alert(`iOS file has been downloaded!\nIncluded sizes: ${this.mergedIcon.sizes.join(', ')}px\n\nNote: JSZip library is required for real ZIP file creation.`);
+    }
+    
+    // Sentry 에러 테스트 함수
+    testSentryError() {
+        try {
+            // 의도적으로 에러 발생
+            throw new Error('Sentry 테스트 에러입니다! 이 에러는 Sentry 대시보드에서 확인할 수 있습니다.');
+        } catch (error) {
+            // Sentry로 에러 전송
+            if (typeof Sentry !== 'undefined') {
+                Sentry.captureException(error);
+                alert('Sentry로 테스트 에러가 전송되었습니다! Sentry 대시보드를 확인해보세요.');
+            } else {
+                alert('Sentry가 설정되지 않았습니다. DSN을 확인해주세요.');
+            }
+        }
     }
 }
 
