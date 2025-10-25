@@ -245,39 +245,41 @@ class IconMerger {
         const reader = new FileReader();
         reader.onload = (e) => {
             const imageSrc = e.target.result;
+            const platform = this.currentPlatform;
             
-            // 모든 플랫폼에 대해 리사이즈된 이미지 생성
-            Object.keys(this.platformSizes).forEach(platform => {
-                this.resizedImages[platform] = this.platformSizes[platform].map(size => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = size;
-                    canvas.height = size;
+            console.log(`📦 Creating resized images for: ${platform}`);
+            
+            // 현재 선택된 플랫폼에 대해서만 리사이즈된 이미지 생성
+            this.resizedImages[platform] = this.platformSizes[platform].map(size => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = size;
+                canvas.height = size;
+                
+                const img = new Image();
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, size, size);
+                    const dataUrl = canvas.toDataURL('image/png');
                     
-                    const img = new Image();
-                    img.onload = () => {
-                        ctx.drawImage(img, 0, 0, size, size);
-                        const dataUrl = canvas.toDataURL('image/png');
-                        
-                        // 해당 플랫폼의 리사이즈된 이미지 배열에 추가
-                        const resizedImage = this.resizedImages[platform].find(r => r.size === size);
-                        if (resizedImage) {
-                            resizedImage.dataUrl = dataUrl;
-                        }
-                    };
-                    img.src = imageSrc;
-                    
-                    return {
-                        size: size,
-                        dataUrl: null // 나중에 설정됨
-                    };
-                });
+                    // 해당 플랫폼의 리사이즈된 이미지 배열에 추가
+                    const resizedImage = this.resizedImages[platform].find(r => r.size === size);
+                    if (resizedImage) {
+                        resizedImage.dataUrl = dataUrl;
+                    }
+                };
+                img.src = imageSrc;
+                
+                return {
+                    size: size,
+                    dataUrl: null // 나중에 설정됨
+                };
             });
             
             // 현재 플랫폼의 리사이즈된 이미지 표시
             setTimeout(() => {
                 this.displayResizedImages();
                 document.getElementById('resizeSection').style.display = 'block';
+                console.log(`✅ Resized images created for: ${platform}`);
             }, 100);
         };
         reader.readAsDataURL(file);
