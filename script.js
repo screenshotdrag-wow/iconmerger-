@@ -829,7 +829,7 @@ class IconMerger {
         
         URL.revokeObjectURL(url);
         
-        alert(`Real multi-resolution ICO file has been downloaded!\nIncluded sizes: ${this.mergedIcon.sizes.join(', ')}px`);
+        alert(`✅ Windows ICO file has been downloaded!\nIncluded sizes: ${this.mergedIcon.sizes.join(', ')}px`);
     }
 
     createIcnsFile() {
