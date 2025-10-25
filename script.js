@@ -944,6 +944,9 @@ class IconMerger {
             offset += chunk.length;
         });
         
+        // Windows에서 ICNS 파일 검증 (콘솔 출력)
+        this.validateIcnsFile(icnsFile);
+        
         // Blob 생성 및 다운로드
         const blob = new Blob([icnsFile], { type: 'application/octet-stream' });
         const url = URL.createObjectURL(blob);
@@ -962,14 +965,56 @@ class IconMerger {
         alert(`Mac ICNS file has been downloaded!\n\n` +
               `Included sizes: ${sizes.join(', ')}px\n` +
               `File size: ${(totalSize / 1024).toFixed(2)} KB\n\n` +
-              `✅ Windows 테스트:\n` +
-              `- 파일 확장자가 .icns인지 확인\n` +
-              `- Hex 에디터에서 "icns" 헤더 확인 가능\n` +
-              `- 실제 Mac에서 열어보면 아이콘으로 표시됨\n\n` +
-              `📱 Mac에서 실제 사용하려면:\n` +
-              `1. Finder에서 .icns 파일 열기\n` +
-              `2. Preview에서 아이콘 미리보기\n` +
-              `3. Get Info에서 적용 가능`);
+              `✅ Windows 검증 결과 (콘솔 확인):\n` +
+              `- F12 > Console 탭에서 검증 정보 확인\n\n` +
+              `📱 실제 Mac 사용:\n` +
+              `- Finder에서 .icns 파일 열기\n` +
+              `- Preview에서 아이콘 미리보기\n` +
+              `- Get Info에서 아이콘으로 표시`);
+    }
+    
+    validateIcnsFile(icnsFile) {
+        // ICNS 파일 구조 검증
+        console.log('===== ICNS File Validation (Windows Test) =====');
+        console.log('File Size:', icnsFile.length, 'bytes');
+        
+        // 헤더 검증 (0-7 bytes)
+        const header = icnsFile.slice(0, 8);
+        const signature = String.fromCharCode(header[0], header[1], header[2], header[3]);
+        const fileSize = (header[4] << 24) | (header[5] << 16) | (header[6] << 8) | header[7];
+        
+        console.log('✓ Header Signature:', signature);
+        console.log('✓ Expected File Size:', fileSize, 'bytes');
+        console.log('✓ Signature Valid:', signature === 'icns' ? '✅ YES' : '❌ NO');
+        console.log('✓ Size Match:', icnsFile.length === fileSize ? '✅ YES' : '❌ NO');
+        
+        // 청크 검증
+        let offset = 8;
+        let chunkIndex = 1;
+        
+        console.log('\n--- Chunk Structure ---');
+        while (offset < icnsFile.length) {
+            if (offset + 8 > icnsFile.length) {
+                console.error('❌ Invalid chunk structure at offset', offset);
+                break;
+            }
+            
+            const chunkHeader = icnsFile.slice(offset, offset + 8);
+            const chunkType = String.fromCharCode(chunkHeader[0], chunkHeader[1], chunkHeader[2], chunkHeader[3]);
+            const chunkSize = (chunkHeader[4] << 24) | (chunkHeader[5] << 16) | (chunkHeader[6] << 8) | chunkHeader[7];
+            
+            console.log(`Chunk ${chunkIndex}:`);
+            console.log(`  Type: ${chunkType}`);
+            console.log(`  Size: ${chunkSize} bytes`);
+            console.log(`  Position: ${offset}-${offset + chunkSize - 1}`);
+            
+            offset += chunkSize;
+            chunkIndex++;
+        }
+        
+        console.log('===== Validation Complete =====');
+        console.log('💡 If all checks pass (✅), the ICNS file is valid!');
+        console.log('📱 Test on Mac: Open the file in Finder or Preview');
     }
 
     createAndroidZip() {
