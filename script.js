@@ -408,6 +408,9 @@ class IconMerger {
     }
 
     switchPlatform(platform) {
+        // 플랫폼 변경 시 이전 플랫폼의 이미지 상태 초기화
+        console.log(`🔄 Switching platform from ${this.currentPlatform} to ${platform}`);
+        
         this.currentPlatform = platform;
         
         // 플랫폼 버튼 활성화 상태 업데이트
@@ -419,8 +422,16 @@ class IconMerger {
         // 플랫폼 가이드 업데이트
         this.updatePlatformGuide(platform);
         
-        // 리사이즈된 이미지 표시 업데이트
-        if (this.resizedImages[platform]) {
+        // 현재 플랫폼에 대한 리사이즈된 이미지가 없으면 UI 초기화
+        if (!this.resizedImages[platform]) {
+            console.log(`⚠️ No images for ${platform}, resetting UI`);
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('previewArea').style.display = 'none';
+            document.getElementById('resizeSection').style.display = 'none';
+            document.getElementById('conversionArea').style.display = 'none';
+        } else {
+            // 기존 이미지가 있으면 표시
+            console.log(`✅ Showing existing images for ${platform}`);
             this.displayResizedImages();
         }
     }
