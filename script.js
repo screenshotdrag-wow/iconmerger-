@@ -1,6 +1,7 @@
 class IconMerger {
     constructor() {
         this.currentFile = null;
+        this.platformFiles = {}; // 플랫폼별로 파일 저장
         this.convertedIco = null;
         this.resizedImages = {}; // 플랫폼별로 저장
         this.optimizedImage = null;
@@ -189,7 +190,13 @@ class IconMerger {
             return;
         }
 
-        this.currentFile = file;
+        const platform = this.currentPlatform;
+        console.log(`📁 Processing file for platform: ${platform}`);
+        
+        // 현재 플랫폼에 파일 저장
+        this.platformFiles[platform] = file;
+        this.currentFile = file; // 현재 파일 참조도 유지
+        
         this.showFileInfo(file);
         this.createResizedImages(file);
     }
@@ -422,6 +429,9 @@ class IconMerger {
         // 플랫폼 가이드 업데이트
         this.updatePlatformGuide(platform);
         
+        // 현재 플랫폼에 대한 파일 복원
+        this.currentFile = this.platformFiles[platform] || null;
+        
         // 현재 플랫폼에 대한 이미지가 있는지 확인
         const hasImages = this.resizedImages[platform] && this.resizedImages[platform].length > 0;
         
@@ -431,8 +441,13 @@ class IconMerger {
             
             // 원본 이미지 재표시
             if (this.currentFile) {
-                document.getElementById('previewArea').style.display = 'block';
-                document.getElementById('uploadArea').style.display = 'none';
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('previewImage').src = e.target.result;
+                    document.getElementById('previewArea').style.display = 'block';
+                    document.getElementById('uploadArea').style.display = 'none';
+                };
+                reader.readAsDataURL(this.currentFile);
             }
             
             // 리사이즈 섹션 표시
@@ -499,6 +514,12 @@ class IconMerger {
         if (this.resizedImages[platform]) {
             this.resizedImages[platform] = undefined;
             console.log(`✅ Deleted images for ${platform}`);
+        }
+        
+        // 현재 플랫폼의 파일 삭제
+        if (this.platformFiles[platform]) {
+            delete this.platformFiles[platform];
+            console.log(`✅ Deleted file for ${platform}`);
         }
         
         // 현재 플랫폼의 merged icon 초기화
