@@ -422,17 +422,34 @@ class IconMerger {
         // 플랫폼 가이드 업데이트
         this.updatePlatformGuide(platform);
         
-        // 현재 플랫폼에 대한 리사이즈된 이미지가 없으면 UI 초기화
-        if (!this.resizedImages[platform]) {
-            console.log(`⚠️ No images for ${platform}, resetting UI`);
+        // 현재 플랫폼에 대한 이미지가 있는지 확인
+        const hasImages = this.resizedImages[platform] && this.resizedImages[platform].length > 0;
+        
+        if (hasImages) {
+            // 기존 이미지가 있으면 표시
+            console.log(`✅ Showing existing images for ${platform}`);
+            
+            // 원본 이미지 재표시
+            if (this.currentFile) {
+                document.getElementById('previewArea').style.display = 'block';
+                document.getElementById('uploadArea').style.display = 'none';
+            }
+            
+            // 리사이즈 섹션 표시
+            document.getElementById('resizeSection').style.display = 'block';
+            this.displayResizedImages();
+            
+            // 변환 영역 표시 (이미 변환된 경우)
+            if (document.getElementById('downloadArea').style.display !== 'none') {
+                document.getElementById('conversionArea').style.display = 'block';
+            }
+        } else {
+            // 이미지가 없으면 업로드 화면 표시
+            console.log(`⚠️ No images for ${platform}, showing upload area`);
             document.getElementById('uploadArea').style.display = 'block';
             document.getElementById('previewArea').style.display = 'none';
             document.getElementById('resizeSection').style.display = 'none';
             document.getElementById('conversionArea').style.display = 'none';
-        } else {
-            // 기존 이미지가 있으면 표시
-            console.log(`✅ Showing existing images for ${platform}`);
-            this.displayResizedImages();
         }
     }
 
