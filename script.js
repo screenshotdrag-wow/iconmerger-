@@ -671,25 +671,32 @@ class IconMerger {
     }
 
     downloadMergedIcon() {
-        if (!this.mergedIcon) return;
+        if (!this.mergedIcon) {
+            console.log('❌ No merged icon to download');
+            return;
+        }
         
         const platform = this.mergedIcon.platform;
+        
+        console.log(`📥 Downloading ${platform} icon file...`);
         
         // 병합 다운로드 추적
         this.trackDownload('merged', this.mergedIcon.icons.length);
         
         if (platform === 'windows') {
-            // 윈도우용 ICO 파일 생성 (실제 다중 해상도 ICO)
+            console.log('→ Creating Windows ICO file');
             this.createMultiResolutionIco();
         } else if (platform === 'mac') {
-            // 맥용 ICNS 파일 생성
+            console.log('→ Creating Mac ICNS file');
             this.createIcnsFile();
         } else if (platform === 'android') {
-            // 안드로이드용 ZIP 파일 생성 (다양한 해상도 PNG들)
+            console.log('→ Creating Android ZIP file');
             this.createAndroidZip();
         } else if (platform === 'ios') {
-            // iOS용 ZIP 파일 생성 (다양한 크기 PNG들)
+            console.log('→ Creating iOS ZIP file');
             this.createIosZip();
+        } else {
+            console.error(`❌ Unknown platform: ${platform}`);
         }
     }
 
