@@ -492,14 +492,21 @@ class IconMerger {
             return;
         }
 
-        // 모든 상태 초기화
-        this.currentFile = null;
-        this.convertedIco = null;
-        this.resizedImages = {};
-        this.optimizedImage = null;
-        this.mergedIcon = null;
+        const platform = this.currentPlatform;
+        console.log(`🗑️ Deleting image for: ${platform}`);
+        
+        // 현재 플랫폼의 상태만 초기화 (다른 플랫폼은 유지)
+        if (this.resizedImages[platform]) {
+            this.resizedImages[platform] = undefined;
+            console.log(`✅ Deleted images for ${platform}`);
+        }
+        
+        // 현재 플랫폼의 merged icon 초기화
+        if (this.mergedIcon && this.mergedIcon.platform === platform) {
+            this.mergedIcon = null;
+        }
 
-        // UI 초기화
+        // UI 초기화 (현재 플랫폼만)
         document.getElementById('uploadArea').style.display = 'block';
         document.getElementById('previewArea').style.display = 'none';
         document.getElementById('resizeSection').style.display = 'none';
@@ -508,20 +515,11 @@ class IconMerger {
         // 파일 입력 초기화
         document.getElementById('fileInput').value = '';
         document.getElementById('fileInput2').value = '';
+        
+        // 현재 파일 참조 제거
+        this.currentFile = null;
 
-        // 플랫폼 선택 초기화
-        this.currentPlatform = 'windows';
-        document.querySelectorAll('.platform-btn').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.platform === 'windows') {
-                btn.classList.add('active');
-            } else {
-                btn.classList.add('disabled');
-            }
-        });
-        this.updatePlatformGuide('windows');
-
-        alert('Image has been deleted.');
+        alert(`Image deleted for ${platform}.\nOther platforms' images are preserved.`);
     }
 
     convertToIco() {
