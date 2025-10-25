@@ -442,12 +442,12 @@ class IconMerger {
             android: {
                 title: 'Android Icons',
                 description: 'Display each size at actual size',
-                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>512×512px</strong> recommended (Android)</p>'
+                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>512×512px</strong> recommended (Android ZIP)</p><p>• 📦 mipmap 폴더 구조의 PNG 파일들</p>'
             },
             ios: {
                 title: 'iOS Icons',
                 description: 'Display each size at actual size',
-                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>1024×1024px</strong> recommended (iOS)</p>'
+                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>1024×1024px</strong> recommended (iOS ZIP)</p><p>• 📦 App Icon 세트 PNG 파일들</p>'
             }
         };
         
@@ -1048,7 +1048,20 @@ class IconMerger {
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
             
-            alert(`Android ZIP file has been downloaded!\nIncluded sizes: ${this.mergedIcon.sizes.join(', ')}px\n\nFolder structure:\n- drawable-ldpi/\n- drawable-mdpi/\n- drawable-hdpi/\n- drawable-xhdpi/\n- drawable-xxhdpi/\n- drawable-xxxhdpi/`);
+            const sizes = this.mergedIcon.icons.map(icon => icon.size);
+            alert(`✅ Android ZIP file has been downloaded!\n\n` +
+                  `Included sizes: ${sizes.join(', ')}px\n` +
+                  `📦 Android mipmap 폴더 구조:\n` +
+                  `- mipmap-ldpi/\n` +
+                  `- mipmap-mdpi/\n` +
+                  `- mipmap-hdpi/\n` +
+                  `- mipmap-xhdpi/\n` +
+                  `- mipmap-xxhdpi/\n` +
+                  `- mipmap-xxxhdpi/\n\n` +
+                  `📱 사용법:\n` +
+                  `1. ZIP 파일 압축 해제\n` +
+                  `2. Android Studio 프로젝트의 res/ 폴더에 복사\n` +
+                  `3. ic_launcher.png로 앱 아이콘 자동 적용`);
         });
     }
 
@@ -1118,7 +1131,21 @@ class IconMerger {
             document.body.removeChild(link);
             URL.revokeObjectURL(link.href);
             
-            alert(`iOS ZIP file has been downloaded!\nIncluded sizes: ${this.mergedIcon.sizes.join(', ')}px\n\nFile structure:\n- Icon-20.png\n- Icon-29.png\n- Icon-40.png\n- Icon-58.png\n- Icon-60.png\n- Icon-76.png\n- Icon-80.png\n- Icon-87.png\n- Icon-120.png\n- Icon-152.png\n- Icon-167.png\n- Icon-180.png\n- Icon-1024.png`);
+            const sizes = this.mergedIcon.icons.map(icon => icon.size);
+            alert(`✅ iOS ZIP file has been downloaded!\n\n` +
+                  `Included sizes: ${sizes.join(', ')}px\n` +
+                  `📦 iOS App Icon 세트:\n` +
+                  `- Icon-20.png (1x, 2x, 3x)\n` +
+                  `- Icon-29.png (1x, 2x, 3x)\n` +
+                  `- Icon-40.png (1x, 2x, 3x)\n` +
+                  `- Icon-60.png (2x, 3x)\n` +
+                  `- Icon-76.png (1x, 2x)\n` +
+                  `- Icon-1024.png (App Store)\n\n` +
+                  `📱 사용법:\n` +
+                  `1. ZIP 파일 압축 해제\n` +
+                  `2. Xcode 프로젝트 Assets.xcassets에 추가\n` +
+                  `3. AppIcon에 이미지 드래그 앤 드롭\n` +
+                  `4. 빌드 후 앱 아이콘으로 표시됨`);
         });
     }
 
