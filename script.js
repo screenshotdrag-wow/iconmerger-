@@ -115,20 +115,7 @@ class IconMerger {
                     return;
                 }
                 
-                // Mac 플랫폼 테스트 안내
-                if (platform === 'mac') {
-                    if (!this.currentFile) {
-                        alert('먼저 PNG 이미지를 업로드해주세요!');
-                        return;
-                    }
-                    const confirmText = 'Mac ICNS 파일을 생성하시겠습니까?\n\n' +
-                                       '✅ Windows에서 테스트 가능:\n' +
-                                       '- Hex 에디터에서 "icns" 헤더 확인\n' +
-                                       '- 파일 구조 검증 가능\n\n' +
-                                       '📱 실제 Mac에서만 완전한 렌더링이 가능합니다.';
-                    if (!confirm(confirmText)) return;
-                }
-                
+                // 플랫폼 전환
                 this.switchPlatform(platform);
             });
         });
