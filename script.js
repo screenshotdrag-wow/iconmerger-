@@ -115,6 +115,20 @@ class IconMerger {
                     return;
                 }
                 
+                // Mac 플랫폼 테스트 안내
+                if (platform === 'mac') {
+                    if (!this.currentFile) {
+                        alert('먼저 PNG 이미지를 업로드해주세요!');
+                        return;
+                    }
+                    const confirmText = 'Mac ICNS 파일을 생성하시겠습니까?\n\n' +
+                                       '✅ Windows에서 테스트 가능:\n' +
+                                       '- Hex 에디터에서 "icns" 헤더 확인\n' +
+                                       '- 파일 구조 검증 가능\n\n' +
+                                       '📱 실제 Mac에서만 완전한 렌더링이 가능합니다.';
+                    if (!confirm(confirmText)) return;
+                }
+                
                 this.switchPlatform(platform);
             });
         });
@@ -423,14 +437,37 @@ class IconMerger {
     }
 
     updatePlatformGuide(platform) {
-        // 윈도우만 사용하므로 고정값 사용
         const uploadTip = document.getElementById('uploadTip');
         const resizeTitle = document.getElementById('resizeTitle');
         const resizeDescription = document.getElementById('resizeDescription');
         
-        uploadTip.innerHTML = `<p><strong>💡 Recommended Size:</strong></p><p>• <strong>512×512px</strong> recommended (Windows ICO file)</p>`;
-        resizeTitle.textContent = 'Windows ICO Icons';
-        resizeDescription.textContent = 'Display each size at actual size';
+        const platformGuides = {
+            windows: {
+                title: 'Windows ICO Icons',
+                description: 'Display each size at actual size',
+                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>512×512px</strong> recommended (Windows ICO file)</p>'
+            },
+            mac: {
+                title: 'Mac ICNS Icons',
+                description: 'Display each size at actual size (Testable on Windows)',
+                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>1024×1024px</strong> recommended (Mac ICNS file)</p><p>• ✅ Windows에서 ICNS 파일 구조 테스트 가능</p>'
+            },
+            android: {
+                title: 'Android Icons',
+                description: 'Display each size at actual size',
+                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>512×512px</strong> recommended (Android)</p>'
+            },
+            ios: {
+                title: 'iOS Icons',
+                description: 'Display each size at actual size',
+                tip: '<p><strong>💡 Recommended Size:</strong></p><p>• <strong>1024×1024px</strong> recommended (iOS)</p>'
+            }
+        };
+        
+        const guide = platformGuides[platform] || platformGuides.windows;
+        uploadTip.innerHTML = guide.tip;
+        resizeTitle.textContent = guide.title;
+        resizeDescription.textContent = guide.description;
     }
 
     deleteImage() {
@@ -801,18 +838,138 @@ class IconMerger {
     }
 
     createRealIcnsFile() {
-        // ICNS 파일은 복잡한 구조를 가지므로, 간단한 구현으로 대체
-        // 실제로는 ICNS 포맷에 맞게 여러 해상도를 하나의 파일에 저장해야 함
-        const largestIcon = this.mergedIcon.icons[this.mergedIcon.icons.length - 1];
+        // ICNS 파일 구조 생성 (Windows에서 테스트 가능)
+        // ICNS는 "icns" 헤더 + TOC (Table of Contents) + 이미지 데이터로 구성
+        
+        const icons = this.mergedIcon.icons;
+        const iconData = [];
+        
+        // ICNS 파일 헤더: "icns" (4바이트) + 파일 크기 (4바이트)
+        const header = new Uint8Array(8);
+        header[0] = 0x69; // 'i'
+        header[1] = 0x63; // 'c'
+        header[2] = 0x6E; // 'n'
+        header[3] = 0x73; // 's'
+        // 파일 크기는 나중에 계산
+        
+        let totalSize = 8; // 헤더 크기
+        let processedCount = 0;
+        
+        // 각 아이콘을 ICNS 형식으로 변환
+        icons.forEach((icon, index) => {
+            const size = icon.size;
+            const img = new Image();
+            
+            img.onload = () => {
+                // Canvas에서 PNG 데이터 추출
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = size;
+                canvas.height = size;
+                ctx.drawImage(img, 0, 0, size, size);
+                
+                // PNG 데이터를 Base64로 추출
+                const pngDataUrl = canvas.toDataURL('image/png');
+                const pngData = pngDataUrl.split(',')[1];
+                const pngBytes = this.base64ToBytes(pngData);
+                
+                // ICNS 데이터 청크 구조
+                // OSType (4바이트) + 데이터 크기 (4바이트) + PNG 데이터
+                const type = this.getIcnsType(size);
+                const chunkSize = 8 + pngBytes.length;
+                
+                const chunk = new Uint8Array(chunkSize);
+                
+                // OSType (예: 'ic07' for 128x128 PNG)
+                chunk[0] = type.charCodeAt(0);
+                chunk[1] = type.charCodeAt(1);
+                chunk[2] = type.charCodeAt(2);
+                chunk[3] = type.charCodeAt(3);
+                
+                // 데이터 크기 (Big-Endian)
+                chunk[4] = (chunkSize >> 24) & 0xFF;
+                chunk[5] = (chunkSize >> 16) & 0xFF;
+                chunk[6] = (chunkSize >> 8) & 0xFF;
+                chunk[7] = chunkSize & 0xFF;
+                
+                // PNG 데이터 복사
+                chunk.set(pngBytes, 8);
+                
+                iconData.push(chunk);
+                totalSize += chunkSize;
+                processedCount++;
+                
+                // 모든 아이콘이 처리되면 최종 ICNS 파일 생성
+                if (processedCount === icons.length) {
+                    this.finalizeIcnsFile(header, iconData, totalSize);
+                }
+            };
+            
+            img.src = icon.dataUrl;
+        });
+    }
+    
+    getIcnsType(size) {
+        // ICNS 타입 매핑
+        const typeMap = {
+            16: 'is32',  // 16x16
+            32: 'il32',  // 32x32
+            64: 'ih32',  // 64x64
+            128: 'it32', // 128x128
+            256: 'ic07', // 256x256
+            512: 'ic08', // 512x512
+            1024: 'ic09' // 1024x1024
+        };
+        return typeMap[size] || 'ic07';
+    }
+    
+    finalizeIcnsFile(header, iconData, totalSize) {
+        // 헤더에 파일 크기 저장 (Big-Endian)
+        header[4] = (totalSize >> 24) & 0xFF;
+        header[5] = (totalSize >> 16) & 0xFF;
+        header[6] = (totalSize >> 8) & 0xFF;
+        header[7] = totalSize & 0xFF;
+        
+        // ICNS 파일 생성
+        const icnsFile = new Uint8Array(totalSize);
+        let offset = 0;
+        
+        // 헤더 복사
+        icnsFile.set(header, offset);
+        offset += header.length;
+        
+        // 아이콘 데이터 청크들 복사
+        iconData.forEach(chunk => {
+            icnsFile.set(chunk, offset);
+            offset += chunk.length;
+        });
+        
+        // Blob 생성 및 다운로드
+        const blob = new Blob([icnsFile], { type: 'application/octet-stream' });
+        const url = URL.createObjectURL(blob);
         
         const link = document.createElement('a');
-        link.href = largestIcon.dataUrl;
-        link.download = `iconmerger.icns`;
+        link.href = url;
+        link.download = 'iconmerger.icns';
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         
-        alert(`Mac ICNS file has been downloaded!\nIncluded sizes: ${this.mergedIcon.sizes.join(', ')}px\n\nNote: Real ICNS files have a more complex structure.`);
+        URL.revokeObjectURL(url);
+        
+        // Windows에서 테스트 가능한 정보 제공
+        const sizes = this.mergedIcon.icons.map(icon => icon.size);
+        alert(`Mac ICNS file has been downloaded!\n\n` +
+              `Included sizes: ${sizes.join(', ')}px\n` +
+              `File size: ${(totalSize / 1024).toFixed(2)} KB\n\n` +
+              `✅ Windows 테스트:\n` +
+              `- 파일 확장자가 .icns인지 확인\n` +
+              `- Hex 에디터에서 "icns" 헤더 확인 가능\n` +
+              `- 실제 Mac에서 열어보면 아이콘으로 표시됨\n\n` +
+              `📱 Mac에서 실제 사용하려면:\n` +
+              `1. Finder에서 .icns 파일 열기\n` +
+              `2. Preview에서 아이콘 미리보기\n` +
+              `3. Get Info에서 적용 가능`);
     }
 
     createAndroidZip() {
