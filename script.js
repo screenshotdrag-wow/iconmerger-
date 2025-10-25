@@ -6,9 +6,9 @@ class IconMerger {
         this.optimizedImage = null;
         this.platformSizes = {
             windows: [16, 24, 32, 48, 64, 128, 256, 512], // 윈도우 ICO 표준 크기들
-            mac: [16, 32, 64, 128, 256, 512, 1024], // 맥 ICNS 표준 크기들
-            android: [36, 48, 72, 96, 144, 192], // 안드로이드 dp 단위
-            ios: [20, 29, 40, 58, 60, 76, 80, 87, 120, 152, 167, 180, 1024] // iOS pt 단위
+            mac: [16, 32, 64, 128, 256, 512, 1024], // 맥 ICNS 표준 크기들 (macOS 권장)
+            android: [48, 72, 96, 144, 192, 512], // 안드로이드 권장 크기 (mdpi, hdpi, xhdpi, xxhdpi, xxxhdpi, Play Store)
+            ios: [20, 29, 40, 58, 60, 76, 80, 87, 120, 152, 167, 180, 1024] // iOS 권장 크기 (App Icon 모든 해상도)
         };
         this.maxInputSize = 2048; // 최대 입력 크기
         this.optimalInputSize = 512; // 권장 입력 크기 (업계 표준)
