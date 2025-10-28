@@ -592,12 +592,101 @@ class IconMerger {
     }
 
     downloadSingleIcon(size, dataUrl) {
-        const link = document.createElement('a');
-        link.href = dataUrl;
-        link.download = `icon_${size}px.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const platform = this.currentPlatform;
+        
+        if (platform === 'windows') {
+            // Windows: 개별 ICO 파일로 다운로드
+            this.downloadSingleIco(size, dataUrl);
+        } else {
+            // Mac, Android, iOS: PNG 파일로 다운로드
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = `icon_${size}px.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    downloadSingleIco(size, dataUrl) {
+        // Canvas에서 이미지 데이터 추출
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = () => {
+            canvas.width = size;
+            canvas.height = size;
+            ctx.drawImage(img, 0, 0, size, size);
+            
+            // ICO 파일 생성
+            const icoData = this.createSingleIcoFile(canvas, size);
+            
+            // 다운로드
+            const blob = new Blob([icoData], { type: 'image/x-icon' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `icon_${size}px.ico`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        };
+        
+        img.src = dataUrl;
+    }
+
+    createSingleIcoFile(canvas, size) {
+        // 단일 아이콘용 ICO 파일 생성
+        const pngData = canvas.toDataURL('image/png').split(',')[1];
+        const pngBytes = this.base64ToBytes(pngData);
+        
+        // ICO 파일 헤더 생성 (6바이트)
+        const header = new Uint8Array(6);
+        header[0] = 0; // Reserved (must be 0)
+        header[1] = 0;
+        header[2] = 1; // Type (1 = icon)
+        header[3] = 0;
+        header[4] = 1; // Number of images (1개)
+        header[5] = 0;
+
+        // 디렉토리 엔트리 생성 (16바이트)
+        const entry = new Uint8Array(16);
+        entry[0] = size === 256 ? 0 : size; // Width (0 if 256)
+        entry[1] = size === 256 ? 0 : size; // Height (0 if 256)
+        entry[2] = 0; // Color palette (0 for PNG)
+        entry[3] = 0; // Reserved
+        entry[4] = 1; // Color planes
+        entry[5] = 0;
+        entry[6] = 32; // Bits per pixel
+        entry[7] = 0;
+        entry[8] = pngBytes.length & 0xFF; // Image size (low byte)
+        entry[9] = (pngBytes.length >> 8) & 0xFF;
+        entry[10] = (pngBytes.length >> 16) & 0xFF;
+        entry[11] = (pngBytes.length >> 24) & 0xFF;
+        entry[12] = 22 & 0xFF; // Image offset (22 = 6 + 16)
+        entry[13] = 0;
+        entry[14] = 0;
+        entry[15] = 0;
+
+        // 전체 ICO 파일 생성
+        const totalSize = header.length + entry.length + pngBytes.length;
+        const icoFile = new Uint8Array(totalSize);
+        let offset = 0;
+        
+        // 헤더 복사
+        icoFile.set(header, offset);
+        offset += header.length;
+        
+        // 디렉토리 엔트리 복사
+        icoFile.set(entry, offset);
+        offset += entry.length;
+        
+        // PNG 데이터 복사
+        icoFile.set(pngBytes, offset);
+        
+        return icoFile;
     }
 
     downloadIco() {
