@@ -534,6 +534,14 @@ body {
     margin: 0;
 }
 
+.converted-icon-item .btn-small {
+    font-size: 0.7rem;
+    padding: 6px 12px;
+    margin-top: 5px;
+    width: 100%;
+    max-width: 120px;
+}
+
 .icon-checkbox {
     position: absolute;
     top: 8px;

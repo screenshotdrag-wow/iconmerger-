@@ -586,6 +586,9 @@ class IconMerger {
                          style="width: ${displaySize}px; height: ${displaySize}px;">
                     <p class="size-label">${resized.size}×${resized.size}</p>
                     <p class="size-info">${this.getSizeDescription(platform, resized.size)}</p>
+                    <button class="btn btn-small" onclick="iconMerger.downloadSingleIcon(${resized.size}, '${resized.dataUrl}')">
+                        Download ${resized.size}px
+                    </button>
                 </div>
             `;
         }).join('');
